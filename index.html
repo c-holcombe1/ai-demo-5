@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A five-minute AI terminology icebreaker for AIPP learners.">
+  <title>AI Term Dash | AIPP Icebreaker</title>
+  <style>
+    :root {
+      --bg: #071426;
+      --panel: #10233f;
+      --panel2: #173052;
+      --text: #f7fbff;
+      --muted: #b7c8dc;
+      --accent: #6ee7ff;
+      --accent2: #a78bfa;
+      --good: #4ade80;
+      --bad: #fb7185;
+      --gold: #fbbf24;
+      --shadow: 0 20px 55px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110,231,255,.16), transparent 30%),
+        radial-gradient(circle at 85% 20%, rgba(167,139,250,.18), transparent 28%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid; place-items: center; padding: 18px;
+    }
+    .app { width: min(920px, 100%); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+    .brand { font-weight:900; letter-spacing:.03em; }
+    .pill { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); padding:8px 12px; border-radius:999px; font-weight:800; }
+    .card { background:linear-gradient(145deg, rgba(23,48,82,.96), rgba(16,35,63,.98)); border:1px solid rgba(255,255,255,.13); border-radius:24px; box-shadow:var(--shadow); padding:clamp(22px,5vw,46px); }
+    .screen { display:none; }
+    .screen.active { display:block; animation:rise .24s ease-out; }
+    @keyframes rise { from {opacity:0; transform:translateY(8px)} to {opacity:1; transform:none} }
+    h1 { font-size:clamp(2rem,7vw,4.7rem); line-height:.98; margin:.2em 0; letter-spacing:-.05em; }
+    h2 { font-size:clamp(1.45rem,4vw,2.4rem); line-height:1.15; margin:.25em 0 .6em; }
+    p { color:var(--muted); line-height:1.55; font-size:1.05rem; }
+    .gradient { color:var(--accent); }
+    .rules { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:24px 0; }
+    .rule { background:rgba(255,255,255,.06); border-radius:16px; padding:14px; color:var(--muted); }
+    .rule b { display:block; color:var(--text); margin-bottom:4px; }
+    button { font:inherit; }
+    .primary, .secondary { border:0; border-radius:14px; padding:14px 20px; font-weight:900; cursor:pointer; transition:.15s transform,.15s filter; }
+    .primary { color:#04111f; background:linear-gradient(90deg,var(--accent),#bf9cff); }
+    .secondary { color:var(--text); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.15); }
+    button:hover { transform:translateY(-1px); filter:brightness(1.06); }
+    button:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
+    .meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; margin-bottom:18px; }
+    .progress { height:10px; background:rgba(255,255,255,.09); border-radius:999px; overflow:hidden; margin-bottom:24px; }
+    .progress > div { height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .25s; }
+    .level { color:var(--accent); text-transform:uppercase; font-weight:900; letter-spacing:.12em; font-size:.8rem; }
+    .answers { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px; }
+    .answer { min-height:72px; text-align:left; color:var(--text); background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.11); border-radius:16px; padding:15px; cursor:pointer; font-weight:750; line-height:1.35; }
+    .answer.correct { border-color:var(--good); background:rgba(74,222,128,.15); }
+    .answer.wrong { border-color:var(--bad); background:rgba(251,113,133,.16); }
+    .answer:disabled { cursor:default; }
+    .feedback { min-height:76px; margin-top:16px; padding:14px 16px; border-radius:14px; display:none; background:rgba(0,0,0,.18); color:var(--muted); line-height:1.45; }
+    .feedback.show { display:block; }
+    .feedback strong { color:var(--text); }
+    .next-row { display:flex; justify-content:flex-end; margin-top:14px; }
+    .score-big { font-size:clamp(3.2rem,12vw,7.2rem); font-weight:1000; line-height:1; color:var(--accent); margin:14px 0 4px; }
+    .badge { display:inline-block; padding:8px 12px; border-radius:999px; background:rgba(251,191,36,.15); border:1px solid rgba(251,191,36,.4); color:#ffe49a; font-weight:900; }
+    .results-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0; }
+    .result-box { background:rgba(255,255,255,.06); border-radius:16px; padding:16px; }
+    .result-box span { display:block; color:var(--muted); font-size:.9rem; }
+    .result-box b { font-size:1.4rem; }
+    .tiny { font-size:.86rem; color:var(--muted); margin-top:16px; }
+    @media (max-width:640px) { .rules,.answers,.results-grid{grid-template-columns:1fr}.card{border-radius:18px}.topbar{font-size:.9rem} }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after{animation:none!important;transition:none!important} }
+  </style>
+</head>
+<body>
+  <main class="app" aria-live="polite">
+    <div class="topbar">
+      <div class="brand">AIPP · AI TERM DASH</div>
+      <div class="pill" id="timer" aria-label="Time remaining">05:00</div>
+    </div>
+
+    <section class="card screen active" id="startScreen">
+      <div class="level">Five-minute icebreaker</div>
+      <h1>How fluent is your <span class="gradient">AI vocabulary?</span></h1>
+      <p>Ten questions. The terminology gets progressively harder. Choose the best answer, learn from the explanation, and see whether you reach AI Translator status.</p>
+      <div class="rules">
+        <div class="rule"><b>10 questions</b>From foundations to responsible AI</div>
+        <div class="rule"><b>5 minutes</b>Quick decisions beat overthinking</div>
+        <div class="rule"><b>1 best answer</b>Immediate explanations after each choice</div>
+      </div>
+      <button class="primary" id="startBtn" type="button">Start the challenge</button>
+      <div class="tiny">Tip for facilitators: ask learners to play individually, then compare the terms that caused debate.</div>
+    </section>
+
+    <section class="card screen" id="quizScreen">
+      <div class="meta">
+        <div><span class="level" id="levelText">FOUNDATIONS</span></div>
+        <div class="pill"><span id="questionNumber">1</span>/10 · <span id="score">0</span> pts</div>
+      </div>
+      <div class="progress" aria-label="Quiz progress"><div id="progressBar"></div></div>
+      <h2 id="questionText"></h2>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="next-row"><button class="primary" id="nextBtn" type="button" hidden>Next question</button></div>
+    </section>
+
+    <section class="card screen" id="resultScreen">
+      <div class="level">Challenge complete</div>
+      <div class="score-big"><span id="finalScore">0</span>/10</div>
+      <h2 id="resultTitle">AI Explorer</h2>
+      <div class="badge" id="badge">FOUNDATIONS UNLOCKED</div>
+      <p id="resultMessage"></p>
+      <div class="results-grid">
+        <div class="result-box"><span>Correct answers</span><b id="correctCount">0</b></div>
+        <div class="result-box"><span>Time used</span><b id="timeUsed">0:00</b></div>
+      </div>
+      <button class="primary" id="restartBtn" type="button">Play again</button>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const questions = [
+        {
+          level: "Foundations",
+          q: "Which term describes a computer system performing tasks that normally require human intelligence?",
+          a: ["Artificial intelligence", "Cloud storage", "Encryption", "Version control"],
+          correct: 0,
+          explain: "Artificial intelligence (AI) is the broad field of creating systems that perform tasks associated with human intelligence, such as reasoning, language or perception."
+        },
+        {
+          level: "Foundations",
+          q: "What is a prompt when using a generative AI tool?",
+          a: ["A software update", "The instruction or input given to the AI", "A saved password", "The final AI output"],
+          correct: 1,
+          explain: "A prompt is the instruction, question or context supplied to a generative AI system. Clear context and constraints usually improve the response."
+        },
+        {
+          level: "Core concepts",
+          q: "What does machine learning enable a system to do?",
+          a: ["Learn patterns from data", "Think exactly like a human", "Work without electricity", "Guarantee every prediction"],
+          correct: 0,
+          explain: "Machine learning uses data to identify patterns and improve performance on a defined task without every rule being manually programmed."
+        },
+        {
+          level: "Core concepts",
+          q: "In generative AI, what is a token?",
+          a: ["A legal approval", "A user account", "A chunk of text processed by the model", "A verified fact"],
+          correct: 2,
+          explain: "A token is a unit the model processes. It may be a whole word, part of a word, punctuation or another small text element."
+        },
+        {
+          level: "Core concepts",
+          q: "What is an AI hallucination?",
+          a: ["The model becomes conscious", "A confident-sounding but false or unsupported output", "The screen freezes", "An encrypted response"],
+          correct: 1,
+          explain: "A hallucination is content generated without reliable grounding that may be inaccurate or invented, even when it sounds convincing."
+        },
+        {
+          level: "Applied AI",
+          q: "What best describes a large language model (LLM)?",
+          a: ["A database of approved answers", "A model trained to predict and generate language", "A search engine with no model", "A spreadsheet automation"],
+          correct: 1,
+          explain: "An LLM learns statistical patterns from large amounts of text and generates language by predicting likely tokens in context."
+        },
+        {
+          level: "Applied AI",
+          q: "What is retrieval-augmented generation (RAG)?",
+          a: ["Deleting training data", "Grounding a model with retrieved information before it responds", "Making the model respond randomly", "Replacing prompts with code"],
+          correct: 1,
+          explain: "RAG retrieves relevant content from selected sources and gives it to the model as context, helping produce more grounded and current responses."
+        },
+        {
+          level: "Advanced",
+          q: "What does temperature usually control in a generative model?",
+          a: ["Device heat", "Response length only", "Randomness and variation in output", "Whether sources are correct"],
+          correct: 2,
+          explain: "Temperature affects how varied or predictable token selection is. Lower values are usually more consistent; higher values can be more diverse."
+        },
+        {
+          level: "Advanced",
+          q: "What is an AI agent?",
+          a: ["Any chatbot reply", "A system that can plan and take actions using tools toward a goal", "A person who sells AI", "A model's training dataset"],
+          correct: 1,
+          explain: "An AI agent combines a model with instructions, tools and often memory so it can decide and perform multiple steps toward a goal."
+        },
+        {
+          level: "Responsible AI",
+          q: "A recruitment model disadvantages a group because historical hiring data contained unequal patterns. What is this primarily an example of?",
+          a: ["Latency", "Compression", "Algorithmic bias", "Tokenisation"],
+          correct: 2,
+          explain: "Algorithmic bias can arise when data, design or deployment reproduces unfair patterns. Testing outcomes across groups and maintaining human oversight are important controls."
+        }
+      ];
+
+      const $ = id => document.getElementById(id);
+      const screens = [$("startScreen"), $("quizScreen"), $("resultScreen")];
+      let current = 0, score = 0, seconds = 300, timerId = null, startedAt = null, locked = false;
+
+      function show(screen) { screens.forEach(s => s.classList.toggle("active", s === screen)); }
+      function formatTime(s) { const m = Math.floor(s/60); return `${String(m).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; }
+      function tick() {
+        seconds = Math.max(0, seconds - 1);
+        $("timer").textContent = formatTime(seconds);
+        if (seconds === 0) finish();
+      }
+      function start() {
+        current = 0; score = 0; seconds = 300; locked = false; startedAt = Date.now();
+        $("timer").textContent = "05:00";
+        clearInterval(timerId); timerId = setInterval(tick, 1000);
+        show($("quizScreen")); render();
+      }
+      function render() {
+        locked = false;
+        const item = questions[current];
+        $("levelText").textContent = item.level;
+        $("questionNumber").textContent = current + 1;
+        $("score").textContent = score;
+        $("progressBar").style.width = `${(current/questions.length)*100}%`;
+        $("questionText").textContent = item.q;
+        $("feedback").className = "feedback";
+        $("feedback").textContent = "";
+        $("nextBtn").hidden = true;
+        $("nextBtn").textContent = current === questions.length - 1 ? "See results" : "Next question";
+        const box = $("answers"); box.innerHTML = "";
+        item.a.forEach((text, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button"; btn.className = "answer"; btn.textContent = text;
+          btn.addEventListener("click", () => answer(i));
+          box.appendChild(btn);
+        });
+      }
+      function answer(choice) {
+        if (locked) return; locked = true;
+        const item = questions[current];
+        const buttons = [...document.querySelectorAll(".answer")];
+        buttons.forEach((b,i) => { b.disabled = true; if(i===item.correct) b.classList.add("correct"); });
+        const right = choice === item.correct;
+        if (right) score++;
+        else buttons[choice].classList.add("wrong");
+        $("score").textContent = score;
+        const f = $("feedback");
+        f.innerHTML = `<strong>${right ? "Correct." : "Not quite."}</strong> ${item.explain}`;
+        f.classList.add("show");
+        $("nextBtn").hidden = false;
+        $("nextBtn").focus();
+      }
+      function next() { current++; current >= questions.length ? finish() : render(); }
+      function finish() {
+        clearInterval(timerId);
+        const elapsed = startedAt ? Math.min(300, Math.round((Date.now()-startedAt)/1000)) : 300-seconds;
+        let title, badge, msg;
+        if (score >= 9) { title="AI Translator"; badge="TERMINOLOGY MASTERED"; msg="You can explain both core and advanced AI language clearly. Your challenge: help somebody else unpack the trickiest term."; }
+        else if (score >= 7) { title="AI Navigator"; badge="STRONG AI FLUENCY"; msg="You have a strong working vocabulary. Revisit the explanations for any terms you missed and compare examples with a partner."; }
+        else if (score >= 5) { title="AI Explorer"; badge="GOOD FOUNDATIONS"; msg="You have the foundations. Choose one unfamiliar term and explain it in plain English before the next activity."; }
+        else { title="AI Starter"; badge="CURIOSITY ACTIVATED"; msg="A useful starting point. Pick two terms from the game and ask a partner for a workplace example of each."; }
+        $("finalScore").textContent=score; $("correctCount").textContent=`${score} of 10`;
+        $("timeUsed").textContent=`${Math.floor(elapsed/60)}:${String(elapsed%60).padStart(2,"0")}`;
+        $("resultTitle").textContent=title; $("badge").textContent=badge; $("resultMessage").textContent=msg;
+        $("progressBar").style.width="100%"; show($("resultScreen"));
+      }
+      $("startBtn").addEventListener("click", start);
+      $("nextBtn").addEventListener("click", next);
+      $("restartBtn").addEventListener("click", start);
+    })();
+  </script>
+</body>
+</html>
